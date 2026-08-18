@@ -1,0 +1,529 @@
+{
+  "name": "Discord Stock update news(multi artcle)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -544,
+        -176
+      ],
+      "id": "2f7fb780-e942-4597-8ba9-94fe1c68078b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following Marketaux stock market news article.\n\nNEWS ID:\n{{ $json.news_id }}\n\nSTOCK SYMBOL:\n{{ $json.primary_symbol }}\n\nCOMPANY:\n{{ $json.primary_company }}\n\nINDUSTRY:\n{{ $json.primary_industry }}\n\nHEADLINE:\n{{ $json.title }}\n\nDESCRIPTION:\n{{ $json.description }}\n\nSNIPPET:\n{{ $json.snippet }}\n\nMARKETAUX SENTIMENT:\n{{ $json.primary_sentiment }}\n\nAVERAGE ENTITY SENTIMENT:\n{{ $json.average_sentiment }}\n\nSOURCE:\n{{ $json.source }}\n\nPUBLISHED AT:\n{{ $json.published_at }}\n\nURL:\n{{ $json.url }}\n\nIDENTIFIED SYMBOLS:\n{{ $json.symbols.join(', ') }}\n\nNEWS ANALYSIS TEXT:\n{{ $json.news_text }}\n\nRELEVANT HIGHLIGHTS:\n{{ JSON.stringify($json.highlights) }}\n\nAnalyze the article and return the required structured output.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a professional stock market news analyst.\n\nAnalyze financial news using the supplied Marketaux article data.\n\nYour task is to determine the likely market sentiment and potential impact of the news on the identified stock.\n\nCLASSIFICATION\n\nSet \"route\" to exactly one of:\n\nBULLISH\nBEARISH\nNEUTRAL\n\nBULLISH:\nUse when the article contains developments that are generally positive for the company or its stock.\n\nBEARISH:\nUse when the article contains developments that are generally negative for the company or its stock.\n\nNEUTRAL:\nUse when the article is mixed, unclear, informational, or unlikely to materially affect the stock.\n\nIMPACT\n\nSet \"impact\" to exactly one of:\n\nLOW\nMEDIUM\nHIGH\n\nCONFIDENCE\n\nReturn a number from 0 to 100.\n\nDo not use decimals for confidence.\n\nSENTIMENT\n\nSet sentiment to:\n\nBULLISH\nBEARISH\nNEUTRAL\n\nSUMMARY\n\nGive a concise factual summary of the article.\n\nWHY_IT_MATTERS\n\nExplain why this news could matter to investors.\n\nKEY_FACTORS\n\nReturn one string containing the most important factors.\n\nSeparate factors using:\n\n|\n\nExample:\n\nAI demand | Data center growth | Competitive advantage\n\nDo NOT return key_factors as an array.\n\nPOTENTIAL_MARKET_EFFECT\n\nDescribe the possible market reaction cautiously.\n\nDo not say that the stock will definitely rise or fall.\n\nTIME_HORIZON\n\nUse exactly one:\n\nSHORT_TERM\nMEDIUM_TERM\nLONG_TERM\n\nMARKETAUX_SENTIMENT\n\nPreserve the supplied Marketaux sentiment score.\n\nIMPORTANT RULES\n\n- Do not invent facts.\n- Base the analysis primarily on the supplied article.\n- Do not provide BUY, SELL, or HOLD recommendations.\n- Do not give financial advice.\n- Do not claim certainty about future stock prices.\n- Do not confuse the news source with the company.\n- Use the primary symbol and primary company supplied by the data whenever available.\n- Return only the fields defined in the structured output schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -176
+      ],
+      "id": "ac832fb0-8248-4772-8ad3-9421b340f7aa",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"route\": {\n      \"type\": \"string\"\n    },\n    \"symbol\": {\n      \"type\": \"string\"\n    },\n    \"company\": {\n      \"type\": \"string\"\n    },\n    \"headline\": {\n      \"type\": \"string\"\n    },\n    \"sentiment\": {\n      \"type\": \"string\"\n    },\n    \"impact\": {\n      \"type\": \"string\"\n    },\n    \"marketaux_sentiment\": {\n      \"type\": \"number\"\n    },\n    \"confidence\": {\n      \"type\": \"number\"\n    },\n    \"summary\": {\n      \"type\": \"string\"\n    },\n    \"why_it_matters\": {\n      \"type\": \"string\"\n    },\n    \"key_factors\": {\n      \"type\": \"string\"\n    },\n    \"potential_market_effect\": {\n      \"type\": \"string\"\n    },\n    \"time_horizon\": {\n      \"type\": \"string\"\n    },\n    \"source\": {\n      \"type\": \"string\"\n    },\n    \"published_at\": {\n      \"type\": \"string\"\n    },\n    \"url\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"route\",\n    \"symbol\",\n    \"company\",\n    \"headline\",\n    \"sentiment\",\n    \"impact\",\n    \"marketaux_sentiment\",\n    \"confidence\",\n    \"summary\",\n    \"why_it_matters\",\n    \"key_factors\",\n    \"potential_market_effect\",\n    \"time_horizon\",\n    \"source\",\n    \"published_at\",\n    \"url\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        64
+      ],
+      "id": "d3e4e10d-0171-4769-9c2f-4a7e72fd1661",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "url": "https://api.marketaux.com/v1/news/all",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_token",
+              "value": "YOUR_MARKETAUX_API_KEY"
+            },
+            {
+              "name": "symbols",
+              "value": "AAPL,TSLA,MSFT,NVDA"
+            },
+            {
+              "name": "filter_entities",
+              "value": "true"
+            },
+            {
+              "name": "must_have_entities",
+              "value": "true"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "group_similar",
+              "value": "false"
+            },
+            {
+              "name": "limit",
+              "value": "3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -320,
+        -176
+      ],
+      "id": "678de4a7-639e-4b0b-8d4f-439f73920cd5",
+      "name": "Get Market Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -176
+      ],
+      "id": "be134184-0316-4ff7-9c21-c4c963fd4628",
+      "name": "Split Out-Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.route }}",
+                    "rightValue": "BULLISH",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "38554191-9b69-4430-85ce-9cab7fa9364c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "763c9bc4-8cbb-4d0a-94d7-f3fd932e5aa0",
+                    "leftValue": "={{ $json.output.route }}",
+                    "rightValue": "BEARISH",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1f427760-2690-40d1-a017-e086015df7e2",
+                    "leftValue": "={{ $json.output.route }}",
+                    "rightValue": "NEUTRAL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "69e7e790-f833-4d05-8bef-5f940fb83777",
+                    "leftValue": "={{ $json.output.route }}",
+                    "rightValue": "HIGH_IMPACT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -208
+      ],
+      "id": "536d182c-d4a5-410b-bbfb-1277e3ffe543",
+      "name": "Switch-Route"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_GUILD_ID",
+          "mode": "list",
+          "cachedResultName": "Your Server Name",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_BULLISH_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "👆bullish-stock-news",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID/YOUR_BULLISH_CHANNEL_ID"
+        },
+        "content": "=🟢 **BULLISH STOCK NEWS**\n\n**{{ $json.output.symbol }} — {{ $json.output.company }}**\n\n📰 **{{ $json.output.headline }}**\n\n📊 Sentiment: **{{ $json.output.sentiment }}**\n🎯 Impact: **{{ $json.output.impact }}**\n💯 Confidence: **{{ $json.output.confidence }}%**\n\n**Summary**\n{{ $json.output.summary }}\n\n**Why it matters**\n{{ $json.output.why_it_matters }}\n\n**Key factors**\n• {{ $json.output.key_factors[0] }}\n• {{ $json.output.key_factors[1] }}\n• {{ $json.output.key_factors[2] }}\n\n📈 Potential effect:\n{{ $json.output.potential_market_effect }}\n\n⏱ Time horizon:\n**{{ $json.output.time_horizon }}**\n\n📰 Source: {{ $json.output.source }}\n\n🔗 {{ $json.output.url }}\n\n⚠️ *Informational market analysis — not investment advice.*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -464
+      ],
+      "id": "20d53726-dcb1-480e-91c5-ea2dea7ee9e5",
+      "name": "Bullish",
+      "webhookId": "YOUR_BULLISH_WEBHOOK_ID",
+      "credentials": {
+        "discordOAuth2Api": {
+          "id": "YOUR_DISCORD_CREDENTIAL_ID",
+          "name": "Discord account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_GUILD_ID",
+          "mode": "list",
+          "cachedResultName": "Your Server Name",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_BEARISH_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "👇bearish-stock-news",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID/YOUR_BEARISH_CHANNEL_ID"
+        },
+        "content": "=🔴 **BEARISH STOCK NEWS**\n\n**{{ $json.output.symbol }} — {{ $json.output.company }}**\n\n📰 **{{ $json.output.headline }}**\n\n📊 Sentiment: **{{ $json.output.sentiment }}**\n🎯 Impact: **{{ $json.output.impact }}**\n💯 Confidence: **{{ $json.output.confidence }}%**\n\n**Summary**\n{{ $json.output.summary }}\n\n**Why it matters**\n{{ $json.output.why_it_matters }}\n\n**Key factors**\n• {{ $json.output.key_factors[0] }}\n• {{ $json.output.key_factors[1] }}\n• {{ $json.output.key_factors[2] }}\n\n📉 Potential effect:\n{{ $json.output.potential_market_effect }}\n\n⏱ Time horizon:\n**{{ $json.output.time_horizon }}**\n\n📰 Source: {{ $json.output.source }}\n\n🔗 {{ $json.output.url }}\n\n⚠️ *Informational market analysis — not investment advice.*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -272
+      ],
+      "id": "a116173c-2dca-46dc-a58b-8b04d143d11b",
+      "name": "Bearish",
+      "webhookId": "YOUR_BEARISH_WEBHOOK_ID",
+      "credentials": {
+        "discordOAuth2Api": {
+          "id": "YOUR_DISCORD_CREDENTIAL_ID",
+          "name": "Discord account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_GUILD_ID",
+          "mode": "list",
+          "cachedResultName": "Your Server Name",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_NEUTRAL_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "👉neutral-stock-news",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID/YOUR_NEUTRAL_CHANNEL_ID"
+        },
+        "content": "=⚪ **STOCK MARKET NEWS**\n\n**{{ $json.output.symbol }} — {{ $json.output.company }}**\n\n📰 **{{ $json.output.headline }}**\n\n📊 Sentiment: **{{ $json.output.sentiment }}**\n🎯 Impact: **{{ $json.output.impact }}**\n\n{{ $json.output.summary }}\n\n**Why it matters**\n{{ $json.output.why_it_matters }}\n\n📰 Source: {{ $json.output.source }}\n\n🔗 {{ $json.output.url }}\n\n⚠️ *Informational market analysis — not investment advice.*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -80
+      ],
+      "id": "3c15769b-128d-49bc-ba45-24b7f9b51044",
+      "name": "Neutral",
+      "webhookId": "YOUR_NEUTRAL_WEBHOOK_ID",
+      "credentials": {
+        "discordOAuth2Api": {
+          "id": "YOUR_DISCORD_CREDENTIAL_ID",
+          "name": "Discord account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_GUILD_ID",
+          "mode": "list",
+          "cachedResultName": "Your Server Name",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_HIGH_IMPACT_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "🤜high-impact-stock-news",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_GUILD_ID/YOUR_HIGH_IMPACT_CHANNEL_ID"
+        },
+        "content": "=🚨 **HIGH IMPACT STOCK NEWS**\n\n**{{ $json.output.symbol }} — {{ $json.output.company }}**\n\n📰 **{{ $json.output.headline }}**\n\n🎯 Impact: **{{ $json.output.impact }}**\n📊 Sentiment: **{{ $json.output.sentiment }}**\n💯 Confidence: **{{ $json.output.confidence }}%**\n\n**Why this matters**\n{{ $json.output.why_it_matters }}\n\n**Key factors**\n• {{ $json.output.key_factors[0] }}\n• {{ $json.output.key_factors[1] }}\n• {{ $json.output.key_factors[2] }}\n\n📈 Potential market effect:\n{{ $json.output.potential_market_effect }}\n\n⏱ Time horizon:\n**{{ $json.output.time_horizon }}**\n\n📰 Source: {{ $json.output.source }}\n\n🔗 {{ $json.output.url }}\n\n⚠️ *Informational market analysis — not investment advice.*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        112
+      ],
+      "id": "3bbc7254-cb17-4b99-8a4e-2df961becba2",
+      "name": "High Impact",
+      "webhookId": "YOUR_HIGH_IMPACT_WEBHOOK_ID",
+      "credentials": {
+        "discordOAuth2Api": {
+          "id": "YOUR_DISCORD_CREDENTIAL_ID",
+          "name": "Discord account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        48
+      ],
+      "id": "bb86a5e7-f354-41d0-93ee-d10873270636",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction cleanText(value) {\n  if (value === null || value === undefined) return '';\n\n  return String(value)\n    .replace(/<[^>]*>/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction numberOrNull(value) {\n  const n = Number(value);\n  return Number.isFinite(n) ? n : null;\n}\n\nconst output = [];\n\nfor (const item of items) {\n  const article = item.json || {};\n\n  // ---------------------------------------\n  // MARKETaux ENTITIES\n  // ---------------------------------------\n\n  const entities = Array.isArray(article.entities)\n    ? article.entities\n    : [];\n\n  // Keep entities that have a stock/entity symbol\n  const validEntities = entities\n    .filter(e => e && e.symbol)\n    .map(e => ({\n      symbol: String(e.symbol).toUpperCase(),\n      name: cleanText(e.name),\n      type: cleanText(e.type),\n      industry: cleanText(e.industry),\n      country: cleanText(e.country),\n      exchange: cleanText(e.exchange),\n      exchange_long: cleanText(e.exchange_long),\n\n      match_score: numberOrNull(e.match_score),\n      sentiment_score: numberOrNull(e.sentiment_score),\n\n      highlights: Array.isArray(e.highlights)\n        ? e.highlights.map(h => ({\n            text: cleanText(h.highlight),\n            sentiment: numberOrNull(h.sentiment),\n            highlighted_in: cleanText(h.highlighted_in)\n          }))\n        : []\n    }));\n\n  // ---------------------------------------\n  // SORT ENTITIES BY MATCH SCORE\n  // ---------------------------------------\n\n  const sortedEntities = [...validEntities].sort(\n    (a, b) => (b.match_score || 0) - (a.match_score || 0)\n  );\n\n  // Most relevant entity\n  const primaryEntity = sortedEntities[0] || null;\n\n  // ---------------------------------------\n  // UNIQUE SYMBOLS\n  // ---------------------------------------\n\n  const symbols = [\n    ...new Set(\n      validEntities.map(e => e.symbol)\n    )\n  ];\n\n  // ---------------------------------------\n  // AVERAGE SENTIMENT\n  // ---------------------------------------\n\n  const sentimentValues = validEntities\n    .map(e => e.sentiment_score)\n    .filter(v => v !== null);\n\n  const averageSentiment = sentimentValues.length\n    ? sentimentValues.reduce(\n        (sum, value) => sum + value,\n        0\n      ) / sentimentValues.length\n    : null;\n\n  // ---------------------------------------\n  // COLLECT HIGHLIGHTS\n  // ---------------------------------------\n\n  const highlights = [];\n\n  for (const entity of validEntities) {\n    for (const h of entity.highlights) {\n      if (h.text) {\n        highlights.push({\n          symbol: entity.symbol,\n          text: h.text,\n          sentiment: h.sentiment,\n          highlighted_in: h.highlighted_in\n        });\n      }\n    }\n  }\n\n  // ---------------------------------------\n  // BUILD AI INPUT TEXT\n  // ---------------------------------------\n\n  const newsText = [\n    `Title: ${cleanText(article.title)}`,\n\n    `Description: ${cleanText(article.description)}`,\n\n    `Snippet: ${cleanText(article.snippet)}`,\n\n    `Source: ${cleanText(article.source)}`,\n\n    `Published: ${cleanText(article.published_at)}`,\n\n    `Symbols: ${symbols.join(', ')}`,\n\n    primaryEntity\n      ? `Primary Company: ${primaryEntity.name} (${primaryEntity.symbol})`\n      : '',\n\n    primaryEntity?.industry\n      ? `Industry: ${primaryEntity.industry}`\n      : '',\n\n    primaryEntity?.sentiment_score !== null &&\n    primaryEntity?.sentiment_score !== undefined\n      ? `Marketaux Sentiment: ${primaryEntity.sentiment_score}`\n      : '',\n\n    highlights.length\n      ? `Relevant Highlights: ${highlights\n          .map(h => `${h.symbol}: ${h.text}`)\n          .join(' | ')}`\n      : ''\n  ]\n    .filter(Boolean)\n    .join('\\n');\n\n  // ---------------------------------------\n  // OUTPUT\n  // ---------------------------------------\n\n  output.push({\n    json: {\n      news_id: article.uuid || '',\n\n      title: cleanText(article.title),\n\n      description: cleanText(article.description),\n\n      snippet: cleanText(article.snippet),\n\n      url: article.url || '',\n\n      image_url: article.image_url || '',\n\n      language: article.language || '',\n\n      source: cleanText(article.source),\n\n      published_at: article.published_at || '',\n\n      // All identified symbols\n      symbols,\n\n      // Primary entity\n      primary_symbol: primaryEntity?.symbol || '',\n\n      primary_company: primaryEntity?.name || '',\n\n      primary_industry: primaryEntity?.industry || '',\n\n      primary_country: primaryEntity?.country || '',\n\n      primary_exchange: primaryEntity?.exchange || '',\n\n      primary_exchange_long:\n        primaryEntity?.exchange_long || '',\n\n      primary_match_score:\n        primaryEntity?.match_score ?? null,\n\n      primary_sentiment:\n        primaryEntity?.sentiment_score ?? null,\n\n      average_sentiment:\n        averageSentiment,\n\n      // Complete entities\n      entities: validEntities,\n\n      // Highlights\n      highlights,\n\n      // Compact text for AI\n      news_text: newsText\n    }\n  });\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -176
+      ],
+      "id": "5dab41c6-94e7-45a5-9fcd-4fa75fd8520b",
+      "name": "Clean/Extract News1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Market Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch-Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Market Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out-Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out-Data": {
+      "main": [
+        [
+          {
+            "node": "Clean/Extract News1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch-Route": {
+      "main": [
+        [
+          {
+            "node": "Bullish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bearish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Neutral",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "High Impact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean/Extract News1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "340b6371-2950-43e5-aa11-f4e7021460bf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  },
+  "tags": []
+}
